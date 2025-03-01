@@ -7,9 +7,14 @@
 package apiserver
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -60,9 +65,36 @@ func (s *Server) Run() error {
 	// 运行 HTTP 服务器
 	// 打印一条日志，用来提示 HTTP 服务已经起来，方便排障
 	slog.Info("Start to listening the incoming requests on http address", "addr", s.cfg.Addr)
-	if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	go func() {
+		if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			slog.Error(err.Error())
+			os.Exit(1)
+		}
+	}()
+
+	// 创建一个 os.Signal 类型的 channel，用于接收系统信号
+	quit := make(chan os.Signal, 1)
+	// 当执行 kill 命令时（不带参数），默认会发送 syscall.SIGTERM 信号
+	// 使用 kill -2 命令会发送 syscall.SIGINT 信号（例如按 CTRL+C 触发）
+	// 使用 kill -9 命令会发送 syscall.SIGKILL 信号，但 SIGKILL 信号无法被捕获，因此无需监听和处理
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	// 阻塞程序，等待从 quit channel 中接收到信号
+	<-quit
+
+	slog.Info("Shutting down server ...")
+
+	// 优雅关闭服务
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// 先关闭依赖的服务，再关闭被依赖的服务
+	// 10 秒内优雅关闭服务（将未处理完的请求处理完再关闭服务），超过 10 秒就超时退出
+	if err := s.srv.Shutdown(ctx); err != nil {
+		slog.Error("Insecure Server forced to shutdown", "err", err)
 		return err
 	}
+
+	slog.Info("Server exited")
 
 	return nil
 }
