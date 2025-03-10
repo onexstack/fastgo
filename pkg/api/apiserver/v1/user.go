@@ -32,6 +32,46 @@ type User struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// LoginRequest 表示登录请求
+type LoginRequest struct {
+	// username 表示用户名称
+	Username string `json:"username"`
+	// password 表示用户密码
+	Password string `json:"password"`
+}
+
+// LoginResponse 表示登录响应
+type LoginResponse struct {
+	// token 表示返回的身份验证令牌
+	Token string `json:"token"`
+	// expireAt 表示该 token 的过期时间
+	ExpireAt time.Time `json:"expireAt"`
+}
+
+// RefreshTokenRequest 表示刷新令牌的请求
+type RefreshTokenRequest struct {
+}
+
+// RefreshTokenResponse 表示刷新令牌的响应
+type RefreshTokenResponse struct {
+	// token 表示返回的身份验证令牌
+	Token string `json:"token"`
+	// expireAt 表示该 token 的过期时间
+	ExpireAt time.Time `json:"expireAt"`
+}
+
+// ChangePasswordRequest 表示修改密码请求
+type ChangePasswordRequest struct {
+	// oldPassword 表示当前密码
+	OldPassword string `json:"oldPassword"`
+	// newPassword 表示准备修改的新密码
+	NewPassword string `json:"newPassword"`
+}
+
+// ChangePasswordResponse 表示修改密码响应
+type ChangePasswordResponse struct {
+}
+
 // CreateUserRequest 表示创建用户请求
 type CreateUserRequest struct {
 	// username 表示用户名称

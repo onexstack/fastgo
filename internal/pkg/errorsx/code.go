@@ -24,4 +24,10 @@ var (
 
 	// ErrInvalidArgument 表示参数验证失败.
 	ErrInvalidArgument = &ErrorX{Code: http.StatusBadRequest, Reason: "InvalidArgument", Message: "Argument verification failed."}
+
+	// ErrSignToken 表示签发 JWT Token 时出错.
+	ErrSignToken = &ErrorX{Code: http.StatusUnauthorized, Reason: "Unauthenticated.SignToken", Message: "Error occurred while signing the JSON web token."}
+
+	// ErrTokenInvalid 表示 JWT Token 格式无效.
+	ErrTokenInvalid = &ErrorX{Code: http.StatusUnauthorized, Reason: "Unauthenticated.TokenInvalid", Message: "Token was invalid."}
 )
