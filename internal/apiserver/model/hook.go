@@ -7,10 +7,10 @@
 package model
 
 import (
-	"github.com/onexstack/onexstack/pkg/authn"
 	"gorm.io/gorm"
 
 	"github.com/onexstack/fastgo/internal/pkg/rid"
+	"github.com/onexstack/fastgo/pkg/auth"
 )
 
 // AfterCreate 在创建数据库记录之后生成 postID.
@@ -24,7 +24,7 @@ func (m *Post) AfterCreate(tx *gorm.DB) error {
 func (m *User) BeforeCreate(tx *gorm.DB) error {
 	// Encrypt the user password.
 	var err error
-	m.Password, err = authn.Encrypt(m.Password)
+	m.Password, err = auth.Encrypt(m.Password)
 	if err != nil {
 		return err
 	}
