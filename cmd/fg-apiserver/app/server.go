@@ -7,9 +7,6 @@
 package app
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -34,23 +31,7 @@ func NewFastGOCommand() *cobra.Command {
 		SilenceUsage: true,
 		// 指定调用 cmd.Execute() 时，执行的 Run 函数
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// 将 viper 中的配置解析到选项 opts 变量中.
-			if err := viper.Unmarshal(opts); err != nil {
-				return err
-			}
-
-			// 对命令行选项值进行校验.
-			if err := opts.Validate(); err != nil {
-				return err
-			}
-
-			fmt.Printf("Read MySQL host from Viper: %s\n", viper.GetString("mysql.host"))
-			fmt.Printf("Read MySQL username from opts: %s\n", opts.MySQLOptions.Username)
-
-			jsonData, _ := json.MarshalIndent(opts, "", "  ")
-			fmt.Println(string(jsonData))
-
-			return nil
+			return run(opts)
 		},
 		// 设置命令运行时的参数检查，不需要指定命令行参数。例如：./fg-apiserver param1 param2
 		Args: cobra.NoArgs,
@@ -64,4 +45,33 @@ func NewFastGOCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVarP(&configFile, "config", "c", filePath(), "Path to the fg-apiserver configuration file.")
 
 	return cmd
+}
+
+// run 是主运行逻辑，负责初始化日志、解析配置、校验选项并启动服务器。
+func run(opts *options.ServerOptions) error {
+	// 将 viper 中的配置解析到 opts.
+	if err := viper.Unmarshal(opts); err != nil {
+		return err
+	}
+
+	// 校验命令行选项
+	if err := opts.Validate(); err != nil {
+		return err
+	}
+
+	// 获取应用配置.
+	// 将命令行选项和应用配置分开，可以更加灵活的处理 2 种不同类型的配置.
+	cfg, err := opts.Config()
+	if err != nil {
+		return err
+	}
+
+	// 创建服务器实例.
+	server, err := cfg.NewServer()
+	if err != nil {
+		return err
+	}
+
+	// 启动服务器
+	return server.Run()
 }
