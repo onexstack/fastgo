@@ -11,6 +11,7 @@
 
 ## 项目快速部署
 
+### 1.Shell  
 ```bash
 $ mkdir -p  $HOME/golang/src/github.com/onexstack/
 $ cd $HOME/golang/src/github.com/onexstack/
@@ -18,6 +19,16 @@ $ git clone https://github.com/onexstack/fastgo
 $ cd fastgo/
 $ ./build.sh
 $ _output/fg-apiserver -c configs/fg-apiserver.yaml
+```
+
+### 2.Task  
+```bash
+$ mkdir -p  $HOME/golang/src/github.com/onexstack/
+$ cd $HOME/golang/src/github.com/onexstack/
+$ git clone https://github.com/onexstack/fastgo
+$ cd fastgo/
+$ go install github.com/go-task/task/v3/cmd/task@latest
+$ task build
 ```
 
 **注意：** 

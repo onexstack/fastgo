@@ -21,3 +21,5 @@ fastgo
 cmd/fg-apiserver/fastgo
 
 _output/
+
+.env

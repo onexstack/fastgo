@@ -1,0 +1,48 @@
+version: '3'
+
+vars:
+  PROJ_ROOT_DIR: "{{.TASK_DIR}}"
+  OUTPUT_DIR: "./_output"
+  VERSION_PACKAGE: "github.com/onexstack/fastgo/pkg/version"
+
+tasks:
+  check-git-status:
+    desc: "Check if the git repository is clean"
+    cmds:
+      - |
+        is_clean=$(git status --porcelain 2>/dev/null)
+        if [[ -z ${is_clean} ]]; then
+          echo "GIT_TREE_STATE=clean" >> .env
+        else
+          echo "GIT_TREE_STATE=dirty" >> .env
+        fi
+
+  get-version:
+    desc: "Get the version from git or environment"
+    cmds:
+      - |
+        if [[ -z "${VERSION}" ]]; then
+          VERSION=$(git describe --tags --always --match='v*')
+        fi
+        echo "VERSION=${VERSION}" >> .env
+
+  get-git-commit:
+    desc: "Get the current git commit hash"
+    cmds:
+      - |
+        GIT_COMMIT=$(git rev-parse HEAD)
+        echo "GIT_COMMIT=${GIT_COMMIT}" >> .env
+
+  build:
+    desc: "Build the project with version information"
+    cmds:
+      - task: check-git-status
+      - task: get-version
+      - task: get-git-commit
+      - |
+        source .env
+        GO_LDFLAGS="-X {{.VERSION_PACKAGE}}.gitVersion=${VERSION} \
+          -X {{.VERSION_PACKAGE}}.gitCommit=${GIT_COMMIT} \
+          -X {{.VERSION_PACKAGE}}.gitTreeState=${GIT_TREE_STATE} \
+          -X {{.VERSION_PACKAGE}}.buildDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+        go build -v -ldflags "${GO_LDFLAGS}" -o {{.OUTPUT_DIR}}/fg-apiserver cmd/fg-apiserver/main.go
