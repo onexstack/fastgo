@@ -32,6 +32,7 @@ func NewServerOptions() *ServerOptions {
 		MySQLOptions: genericoptions.NewMySQLOptions(),
 		Addr:         "0.0.0.0:6666",
 		Expiration:   2 * time.Hour,
+		JWTKey:       "fastgo",
 	}
 }
 
