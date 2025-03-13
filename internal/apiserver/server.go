@@ -24,8 +24,10 @@ import (
 	"github.com/onexstack/fastgo/internal/apiserver/store"
 	"github.com/onexstack/fastgo/internal/pkg/core"
 	"github.com/onexstack/fastgo/internal/pkg/errorsx"
+	"github.com/onexstack/fastgo/internal/pkg/known"
 	mw "github.com/onexstack/fastgo/internal/pkg/middleware"
 	genericoptions "github.com/onexstack/fastgo/pkg/options"
+	"github.com/onexstack/fastgo/pkg/token"
 )
 
 // Config 配置结构体，用于存储应用相关的配置.
@@ -33,6 +35,8 @@ import (
 type Config struct {
 	MySQLOptions *genericoptions.MySQLOptions
 	Addr         string
+	JWTKey       string
+	Expiration   time.Duration
 }
 
 // Server 定义一个服务器结构体类型.
@@ -43,6 +47,9 @@ type Server struct {
 
 // NewServer 根据配置创建服务器.
 func (cfg *Config) NewServer() (*Server, error) {
+	// 初始化 token 包的签名密钥、认证 Key 及 Token 默认过期时间
+	token.Init(cfg.JWTKey, known.XUserID, cfg.Expiration)
+
 	// 创建 Gin 引擎
 	engine := gin.New()
 
@@ -80,7 +87,12 @@ func (cfg *Config) InstallRESTAPI(engine *gin.Engine, store store.IStore) {
 	// 创建核心业务处理器
 	handler := handler.NewHandler(biz.NewBiz(store), validation.NewValidator(store))
 
-	authMiddlewares := []gin.HandlerFunc{}
+	// 注册用户登录和令牌刷新接口。这2个接口比较简单，所以没有 API 版本
+	engine.POST("/login", handler.Login)
+	// 注意：认证中间件要在 handler.RefreshToken 之前加载
+	engine.PUT("/refresh-token", mw.Authn(), handler.RefreshToken)
+
+	authMiddlewares := []gin.HandlerFunc{mw.Authn()}
 
 	// 注册 v1 版本 API 路由分组
 	v1 := engine.Group("/v1")
@@ -90,10 +102,12 @@ func (cfg *Config) InstallRESTAPI(engine *gin.Engine, store store.IStore) {
 		{
 			// 创建用户。这里要注意：创建用户是不用进行认证和授权的
 			userv1.POST("", handler.CreateUser)
-			userv1.PUT(":userID", handler.UpdateUser)    // 更新用户信息
-			userv1.DELETE(":userID", handler.DeleteUser) // 删除用户
-			userv1.GET(":userID", handler.GetUser)       // 查询用户详情
-			userv1.GET("", handler.ListUser)             // 查询用户列表.
+			userv1.Use(authMiddlewares...)
+			userv1.PUT(":userID/change-password", handler.ChangePassword) // 修改用户密码
+			userv1.PUT(":userID", handler.UpdateUser)                     // 更新用户信息
+			userv1.DELETE(":userID", handler.DeleteUser)                  // 删除用户
+			userv1.GET(":userID", handler.GetUser)                        // 查询用户详情
+			userv1.GET("", handler.ListUser)                              // 查询用户列表.
 		}
 
 		// 博客相关路由

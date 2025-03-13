@@ -1,6 +1,11 @@
 # 通用配置
 #
 
+# JWT 签发密钥
+jwt-key: Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5
+# JWT Token 过期时间
+expiration: 1000h
+
 # MySQL 数据库相关配置
 mysql:
   # MySQL 机器 IP 和端口，默认 127.0.0.1:3306
