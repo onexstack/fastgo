@@ -1,8 +1,8 @@
 ## fastgo 项目
 
-- 云原生 AI 实战营项目之一，更多精彩项目见：[云原生 AI 实战营](https://konglingfei.com/)
 - 该实战项目配套课程见： [Go 项目开发极速入门课](https://blog.csdn.net/lnxfei/category_12907774.html)
-- 本初级项目的中级版本：[miniblog](https://github.com/onexstack/miniblog)
+- 本初级项目的中/高级版本为：[miniblog](https://github.com/onexstack/miniblog)
+- 更多「云原生 AI 实战营」项目见：[云原生 AI 实战营项目介绍](https://konglingfei.com/cloudai/intro/%E4%BA%91%E5%8E%9F%E7%94%9F_AI_%E5%AE%9E%E6%88%98%E8%90%A5%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D.html)
 
 ## fastgo 项目适宜人群
 
@@ -31,3 +31,10 @@ $ _output/fg-apiserver -c configs/fg-apiserver.yaml
 
 ![](./docs/images/skills.jpg)
 
+## Contacts
+
+<img src="./docs/images/three-code.png" alt="" width="900" />
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
