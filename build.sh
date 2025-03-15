@@ -19,7 +19,7 @@ fi
 # 默认状态设为"dirty"（有未提交更改）
 GIT_TREE_STATE="dirty"
 # 使用git status检查是否有未提交的更改
-is_clean=$(shell git status --porcelain 2>/dev/null)
+is_clean=$(status --porcelain 2>/dev/null)
 # 如果is_clean为空，说明没有未提交的更改，状态设为"clean"
 if [[ -z ${is_clean} ]];then
   GIT_TREE_STATE="clean"
