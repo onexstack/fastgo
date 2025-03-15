@@ -1,7 +1,8 @@
 ## fastgo 项目
 
-- 云原生 AI 实战营项目之一，更多精彩项目见：[云原生 AI 实战营](https://konglingfei.com/)。
-- 该实战项目配套的课程目录见： [Go 项目开发极速入门课](https://blog.csdn.net/lnxfei/category_12907774.html)。
+- 云原生 AI 实战营项目之一，更多精彩项目见：[云原生 AI 实战营](https://konglingfei.com/)
+- 该实战项目配套课程见： [Go 项目开发极速入门课](https://blog.csdn.net/lnxfei/category_12907774.html)
+- 本初级项目的中级版本：[miniblog](https://github.com/onexstack/miniblog)
 
 ## fastgo 项目适宜人群
 
