@@ -16,7 +16,7 @@ fi
 
 ## 检查代码仓库是否是 dirty（默认dirty）
 GIT_TREE_STATE="dirty"
-is_clean=$(shell git status --porcelain 2>/dev/null)
+is_clean=$(git status --porcelain 2>/dev/null)
 if [[ -z ${is_clean} ]];then
   GIT_TREE_STATE="clean"
 fi
